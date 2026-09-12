@@ -1,0 +1,3579 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escape Ball</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#070a10;
+    color:white;
+    overflow:hidden;
+}
+
+button{
+    color:white;
+    border:0;
+    cursor:pointer;
+}
+
+.screen{
+    display:none;
+    width:100vw;
+    height:100vh;
+}
+
+.screen.active{
+    display:flex;
+}
+
+/* MENU */
+
+#menu{
+    align-items:center;
+    justify-content:center;
+    background:radial-gradient(circle,#172743,#070a10 65%);
+}
+
+.menuBox{
+    width:700px;
+    max-width:92%;
+    text-align:center;
+}
+
+.logo{
+    font-size:70px;
+    font-weight:900;
+    margin-bottom:10px;
+    text-shadow:0 0 25px #287cff;
+}
+
+.coins{
+    display:inline-block;
+    background:#111927;
+    border:2px solid #293b58;
+    border-radius:30px;
+    padding:12px 25px;
+    font-size:22px;
+    margin:20px 0;
+}
+
+.buttons{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+.btn{
+    background:#162235;
+    border:2px solid #293b58;
+    padding:18px;
+    border-radius:12px;
+    font-size:19px;
+    font-weight:bold;
+}
+
+.btn:hover{
+    background:#20334f;
+}
+
+.play{
+    grid-column:1/-1;
+    background:#1769ff;
+    border-color:#4288ff;
+}
+
+/* PANELE */
+
+#levels,
+#shop,
+#stats{
+    justify-content:center;
+    align-items:center;
+}
+
+.panel{
+    width:1100px;
+    max-width:94%;
+    height:90vh;
+    margin:auto;
+    background:#0e1521;
+    border:2px solid #24334a;
+    border-radius:18px;
+    padding:24px;
+    overflow:auto;
+}
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:22px;
+}
+
+.header h2{
+    font-size:32px;
+}
+
+.back{
+    background:#172337;
+    padding:11px 18px;
+    border-radius:9px;
+}
+
+/* LEVELS */
+
+.levelsGrid{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:10px;
+}
+
+.level{
+    height:70px;
+    background:#151f30;
+    border:2px solid #293b55;
+    border-radius:10px;
+    font-size:20px;
+    font-weight:bold;
+}
+
+.level:hover:not(:disabled){
+    background:#213452;
+}
+
+.level.done{
+    border-color:#21d582;
+}
+
+.level:disabled{
+    opacity:.35;
+    cursor:not-allowed;
+}
+
+.endless{
+    grid-column:span 2;
+    background:#28193c;
+    border-color:#a05aff;
+}
+
+/* SHOP */
+
+.tabs{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+}
+
+.tab{
+    background:#172337;
+    padding:13px 22px;
+    border-radius:9px;
+    font-weight:bold;
+}
+
+.tab.active{
+    background:#1769ff;
+}
+
+.shopPage{
+    display:none;
+}
+
+.shopPage.active{
+    display:block;
+}
+
+.lock{
+    background:#302412;
+    border:2px solid #9a6d20;
+    color:#f0c765;
+    padding:15px;
+    border-radius:10px;
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.chests{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+}
+
+.chest{
+    background:#141e2d;
+    border:2px solid #2b3c56;
+    border-radius:14px;
+    padding:20px;
+    text-align:center;
+}
+
+.chestIcon{
+    font-size:55px;
+}
+
+.chest h3{
+    margin:10px 0;
+    font-size:23px;
+}
+
+.chest p{
+    color:#8d9bb0;
+    line-height:1.6;
+    min-height:80px;
+}
+
+.chest button{
+    width:100%;
+    background:#1769ff;
+    padding:12px;
+    border-radius:8px;
+    font-weight:bold;
+}
+
+.inventory{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+    margin-top:15px;
+}
+
+.ability{
+    background:#131c2a;
+    border:2px solid #2a3a54;
+    padding:15px;
+    border-radius:12px;
+}
+
+.ability.equipped{
+    border-color:#21d582;
+}
+
+.ability h4{
+    font-size:19px;
+    margin:7px 0;
+}
+
+.ability p{
+    color:#8e9cb0;
+    font-size:14px;
+    min-height:45px;
+}
+
+.ability button{
+    width:100%;
+    margin-top:10px;
+    padding:9px;
+    border-radius:8px;
+    background:#1d2d46;
+}
+
+.weak{
+    color:#b5becb;
+}
+
+.medium{
+    color:#5faaff;
+}
+
+.rare{
+    color:#c76cff;
+}
+
+/* UPGRADE */
+
+.upgrades{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+}
+
+.upgrade{
+    background:#141e2d;
+    border:2px solid #2b3c56;
+    border-radius:14px;
+    padding:20px;
+}
+
+.upgradeIcon{
+    font-size:40px;
+}
+
+.upgrade h3{
+    margin:10px 0;
+}
+
+.upgrade p{
+    color:#8e9cb0;
+    line-height:1.5;
+    min-height:70px;
+}
+
+.upgrade button{
+    width:100%;
+    background:#1769ff;
+    padding:12px;
+    margin-top:12px;
+    border-radius:8px;
+    font-weight:bold;
+}
+
+.upgrade button:disabled{
+    opacity:.4;
+}
+
+/* STATS */
+
+.stats{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
+
+.stat{
+    background:#141e2d;
+    border:2px solid #2b3c56;
+    border-radius:14px;
+    padding:25px;
+}
+
+.statTitle{
+    color:#8796aa;
+    margin-bottom:8px;
+}
+
+.statValue{
+    font-size:30px;
+    font-weight:bold;
+}
+
+/* GAME */
+
+#game{
+    justify-content:center;
+    align-items:center;
+    background:#030507;
+}
+
+.game{
+    position:relative;
+}
+
+.hud{
+    width:900px;
+    max-width:94vw;
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:8px;
+    font-weight:bold;
+}
+
+canvas{
+    display:block;
+    width:900px;
+    height:600px;
+    max-width:94vw;
+    max-height:75vh;
+    background:#0b111a;
+    border:2px solid #293a53;
+    border-radius:10px;
+}
+
+.gameBack{
+    width:100%;
+    margin-top:8px;
+    padding:10px;
+    background:#172337;
+    border-radius:8px;
+}
+
+.overlay{
+    display:none;
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.82);
+    align-items:center;
+    justify-content:center;
+}
+
+.overlay.show{
+    display:flex;
+}
+
+.overlayBox{
+    width:430px;
+    max-width:90%;
+    background:#101925;
+    border:2px solid #30415c;
+    border-radius:15px;
+    padding:28px;
+    text-align:center;
+}
+
+.overlayBox h2{
+    font-size:35px;
+    margin-bottom:12px;
+}
+
+.overlayBox p{
+    color:#99a7ba;
+    margin-bottom:18px;
+}
+
+.overlayBox button{
+    width:100%;
+    padding:12px;
+    margin:5px 0;
+    background:#1a2a42;
+    border-radius:8px;
+    font-weight:bold;
+}
+
+.overlayBox .primary{
+    background:#1769ff;
+}
+
+#toast{
+    position:fixed;
+    top:20px;
+    left:50%;
+    transform:translate(-50%,-100px);
+    background:#172235;
+    border:2px solid #31445f;
+    padding:12px 22px;
+    border-radius:10px;
+    z-index:100;
+    transition:.25s;
+    font-weight:bold;
+}
+
+#toast.show{
+    transform:translate(-50%,0);
+}
+
+@media(max-width:800px){
+
+    .logo{
+        font-size:48px;
+    }
+
+    .buttons{
+        grid-template-columns:1fr;
+    }
+
+    .play{
+        grid-column:auto;
+    }
+
+    .levelsGrid{
+        grid-template-columns:repeat(4,1fr);
+    }
+
+    .chests,
+    .inventory,
+    .upgrades,
+    .stats{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= MENU ================= -->
+
+<section id="menu" class="screen active">
+
+<div class="menuBox">
+
+<div class="logo">
+ESCAPE BALL
+</div>
+
+<div>
+Zbierz 5 monet i uciekaj do EXIT.
+</div>
+
+<div class="coins">
+🪙 <span id="menuCoins">0</span>
+</div>
+
+<div class="buttons">
+
+<button class="btn play" onclick="startLevel(unlockedLevel)">
+▶ GRAJ
+</button>
+
+<button class="btn" onclick="showLevels()">
+🎮 LEVELS
+</button>
+
+<button class="btn" onclick="showShop()">
+🛒 SHOP
+</button>
+
+<button class="btn" onclick="showStats()">
+📊 STATS
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ================= LEVELS ================= -->
+
+<section id="levels" class="screen">
+
+<div class="panel">
+
+<div class="header">
+
+<h2>🎮 LEVELS</h2>
+
+<button class="back" onclick="showMenu()">
+WRÓĆ
+</button>
+
+</div>
+
+<div id="levelsGrid" class="levelsGrid"></div>
+
+</div>
+
+</section>
+
+
+<!-- ================= SHOP ================= -->
+
+<section id="shop" class="screen">
+
+<div class="panel">
+
+<div class="header">
+
+<h2>🛒 SHOP</h2>
+
+<button class="back" onclick="showMenu()">
+WRÓĆ
+</button>
+
+</div>
+
+
+<div class="tabs">
+
+<button id="tabAgility"
+class="tab active"
+onclick="shopTab('agility')">
+⚡ AGILITY
+</button>
+
+<button id="tabUpgrade"
+class="tab"
+onclick="shopTab('upgrade')">
+🔧 UPGRADE
+</button>
+
+</div>
+
+
+<!-- AGILITY -->
+
+<div id="agilityPage" class="shopPage active">
+
+<div id="agilityLock" class="lock">
+🔒 AGILITY odblokuje się po ukończeniu wszystkich 30 leveli.
+</div>
+
+
+<div class="chests">
+
+<div class="chest">
+
+<div class="chestIcon">📦</div>
+
+<h3>BASIC</h3>
+
+<p>
+SŁABY 85%<br>
+ŚREDNI 14%<br>
+RZADKI 1%
+</p>
+
+<button onclick="openChest('basic')">
+🪙 50
+</button>
+
+</div>
+
+
+<div class="chest">
+
+<div class="chestIcon">🎁</div>
+
+<h3>UNCOMMON</h3>
+
+<p>
+SŁABY 65%<br>
+ŚREDNI 32%<br>
+RZADKI 3%
+</p>
+
+<button onclick="openChest('uncommon')">
+🪙 150
+</button>
+
+</div>
+
+
+<div class="chest">
+
+<div class="chestIcon">💎</div>
+
+<h3>RARE</h3>
+
+<p>
+SŁABY 50%<br>
+ŚREDNI 42%<br>
+RZADKI 8%
+</p>
+
+<button onclick="openChest('rare')">
+🪙 500
+</button>
+
+</div>
+
+</div>
+
+
+<h3 style="margin-top:25px">
+Twoje Agility
+</h3>
+
+<div id="inventory" class="inventory"></div>
+
+</div>
+
+
+<!-- UPGRADE -->
+
+<div id="upgradePage" class="shopPage">
+
+<div class="upgrades">
+
+
+<div class="upgrade">
+
+<div class="upgradeIcon">
+🪙
+</div>
+
+<h3>
+Wielkość monet
+</h3>
+
+<p>
++5% wielkości monet za poziom.
+Maksymalnie +25%.
+</p>
+
+<b>
+Poziom:
+<span id="sizeLvl">0</span>/5
+</b>
+
+<button id="sizeBuy"
+onclick="buyUpgrade('size')">
+</button>
+
+</div>
+
+
+<div class="upgrade">
+
+<div class="upgradeIcon">
+⚡
+</div>
+
+<h3>
+Agility cooldown
+</h3>
+
+<p>
+-0.5 sekundy cooldownu za poziom.
+Maksymalnie -5 sekund.
+</p>
+
+<b>
+Poziom:
+<span id="coolLvl">0</span>/10
+</b>
+
+<button id="coolBuy"
+onclick="buyUpgrade('cool')">
+</button>
+
+</div>
+
+
+<div class="upgrade">
+
+<div class="upgradeIcon">
+💰
+</div>
+
+<h3>
+Coin value
+</h3>
+
+<p>
++20% wartości monet za poziom.
+Maksymalnie +400%.
+</p>
+
+<b>
+Poziom:
+<span id="valueLvl">0</span>/20
+</b>
+
+<button id="valueBuy"
+onclick="buyUpgrade('value')">
+</button>
+
+</div>
+
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ================= STATS ================= -->
+
+<section id="stats" class="screen">
+
+<div class="panel">
+
+<div class="header">
+
+<h2>📊 STATS</h2>
+
+<button class="back" onclick="showMenu()">
+WRÓĆ
+</button>
+
+</div>
+
+
+<div class="stats">
+
+<div class="stat">
+
+<div class="statTitle">
+🪙 Monety
+</div>
+
+<div id="sCoins" class="statValue">
+0
+</div>
+
+</div>
+
+
+<div class="stat">
+
+<div class="statTitle">
+🏆 Ukończone levele
+</div>
+
+<div id="sCompleted" class="statValue">
+0/30
+</div>
+
+</div>
+
+
+<div class="stat">
+
+<div class="statTitle">
+🔓 Odblokowany level
+</div>
+
+<div id="sUnlocked" class="statValue">
+1
+</div>
+
+</div>
+
+
+<div class="stat">
+
+<div class="statTitle">
+🪙 Zebrane monety
+</div>
+
+<div id="sTotalCoins" class="statValue">
+0
+</div>
+
+</div>
+
+
+<div class="stat">
+
+<div class="statTitle">
+⏱️ Czas gry
+</div>
+
+<div id="sTime" class="statValue">
+0s
+</div>
+
+</div>
+
+
+<div class="stat">
+
+<div class="statTitle">
+♾️ Best Endless
+</div>
+
+<div id="sBest" class="statValue">
+0s
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ================= GAME ================= -->
+
+<section id="game" class="screen">
+
+<div class="game">
+
+<div class="hud">
+
+<div>
+
+LEVEL
+<span id="hudLevel">
+1
+</span>
+
+&nbsp;&nbsp;
+
+🪙
+<span id="hudCoins">
+0/5
+</span>
+
+</div>
+
+
+<div>
+
+⚡
+<span id="hudAbility">
+AGILITY LOCK
+</span>
+
+&nbsp;&nbsp;
+
+⏱️
+<span id="hudTime">
+0
+</span>s
+
+</div>
+
+</div>
+
+
+<canvas id="canvas"
+width="900"
+height="600">
+</canvas>
+
+
+<button class="gameBack"
+onclick="leaveGame()">
+WRÓĆ DO MENU
+</button>
+
+
+<!-- GAME OVER -->
+
+<div id="gameOver" class="overlay">
+
+<div class="overlayBox">
+
+<h2>
+💀 GAME OVER
+</h2>
+
+<p>
+Wróg cię złapał!
+</p>
+
+<button class="primary"
+onclick="restartLevel()">
+🔄 JESZCZE RAZ
+</button>
+
+<button onclick="showLevelsFromGame()">
+🎮 LEVELS
+</button>
+
+<button onclick="showStatsFromGame()">
+📊 STATS
+</button>
+
+<button onclick="leaveGame()">
+WRÓĆ
+</button>
+
+</div>
+
+</div>
+
+
+<!-- COMPLETE -->
+
+<div id="complete" class="overlay">
+
+<div class="overlayBox">
+
+<h2>
+🎉 LEVEL COMPLETE!
+</h2>
+
+<p id="completeText"></p>
+
+<button id="nextBtn"
+class="primary"
+onclick="nextLevel()">
+▶ NASTĘPNY
+</button>
+
+<button onclick="showLevelsFromGame()">
+🎮 LEVELS
+</button>
+
+<button onclick="showStatsFromGame()">
+📊 STATS
+</button>
+
+<button onclick="leaveGame()">
+WRÓĆ
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<div id="toast"></div>
+
+
+<script>
+
+/* =========================================================
+   ZAPIS
+========================================================= */
+
+let coins =
+Number(localStorage.getItem("escapeBallCoins")) || 0;
+
+let unlockedLevel =
+Number(localStorage.getItem("escapeBallUnlocked")) || 1;
+
+let completedLevels =
+Number(localStorage.getItem("escapeBallCompletedLevels")) || 0;
+
+let totalCoins =
+Number(localStorage.getItem("escapeBallTotalCoins")) || 0;
+
+let totalTime =
+Number(localStorage.getItem("escapeBallTotalTime")) || 0;
+
+let bestEndless =
+Number(localStorage.getItem("escapeBallBestEndless")) || 0;
+
+let owned =
+JSON.parse(
+localStorage.getItem("escapeBallAgility") || "[]"
+);
+
+let equipped =
+localStorage.getItem("escapeBallEquipped") || "";
+
+let sizeLevel =
+Number(
+localStorage.getItem("escapeBallCoinSizeLevel")
+) || 0;
+
+let cooldownLevel =
+Number(
+localStorage.getItem("escapeBallCooldownLevel")
+) || 0;
+
+let valueLevel =
+Number(
+localStorage.getItem("escapeBallCoinValueLevel")
+) || 0;
+
+
+/* =========================================================
+   ZAPISYWANIE
+========================================================= */
+
+function save(){
+
+localStorage.setItem(
+"escapeBallCoins",
+Math.floor(coins)
+);
+
+localStorage.setItem(
+"escapeBallUnlocked",
+unlockedLevel
+);
+
+localStorage.setItem(
+"escapeBallCompletedLevels",
+completedLevels
+);
+
+localStorage.setItem(
+"escapeBallTotalCoins",
+Math.floor(totalCoins)
+);
+
+localStorage.setItem(
+"escapeBallTotalTime",
+Math.floor(totalTime)
+);
+
+localStorage.setItem(
+"escapeBallBestEndless",
+Math.floor(bestEndless)
+);
+
+localStorage.setItem(
+"escapeBallAgility",
+JSON.stringify(owned)
+);
+
+localStorage.setItem(
+"escapeBallEquipped",
+equipped
+);
+
+localStorage.setItem(
+"escapeBallCoinSizeLevel",
+sizeLevel
+);
+
+localStorage.setItem(
+"escapeBallCooldownLevel",
+cooldownLevel
+);
+
+localStorage.setItem(
+"escapeBallCoinValueLevel",
+valueLevel
+);
+
+updateMenu();
+
+}
+
+
+/* =========================================================
+   POMOCNICZE
+========================================================= */
+
+function num(n){
+
+return Math.floor(n)
+.toLocaleString("pl-PL");
+
+}
+
+
+function nearest10(n){
+
+return Math.round(n/10)*10;
+
+}
+
+
+function coinSize(){
+
+return 1+sizeLevel*0.05;
+
+}
+
+
+function cooldown(base){
+
+return Math.max(
+0.1,
+base-cooldownLevel*0.5
+);
+
+}
+
+
+function coinMultiplier(){
+
+return 1+valueLevel*0.2;
+
+}
+
+
+/* =========================================================
+   EKRANY
+========================================================= */
+
+function screen(id){
+
+document
+.querySelectorAll(".screen")
+.forEach(x=>{
+x.classList.remove("active");
+});
+
+document
+.getElementById(id)
+.classList.add("active");
+
+}
+
+
+function showMenu(){
+
+running=false;
+
+hideOverlays();
+
+screen("menu");
+
+updateMenu();
+
+}
+
+
+function showLevels(){
+
+running=false;
+
+renderLevels();
+
+screen("levels");
+
+}
+
+
+function showShop(){
+
+running=false;
+
+renderShop();
+
+screen("shop");
+
+}
+
+
+function showStats(){
+
+running=false;
+
+renderStats();
+
+screen("stats");
+
+}
+
+
+function updateMenu(){
+
+document
+.getElementById("menuCoins")
+.textContent=num(coins);
+
+}
+
+
+/* =========================================================
+   LEVELS
+========================================================= */
+
+function renderLevels(){
+
+const grid=
+document.getElementById("levelsGrid");
+
+grid.innerHTML="";
+
+
+for(let i=1;i<=30;i++){
+
+const b=
+document.createElement("button");
+
+b.className="level";
+
+b.textContent=i;
+
+
+if(i>unlockedLevel){
+
+b.disabled=true;
+
+b.textContent="🔒 "+i;
+
+}else{
+
+if(i<=completedLevels){
+
+b.classList.add("done");
+
+}
+
+b.onclick=()=>{
+startLevel(i);
+};
+
+}
+
+grid.appendChild(b);
+
+}
+
+
+const e=
+document.createElement("button");
+
+e.className=
+"level endless";
+
+
+if(unlockedLevel>=31){
+
+e.textContent="♾️ ENDLESS";
+
+e.onclick=()=>{
+startLevel(31);
+};
+
+}else{
+
+e.textContent="🔒 ENDLESS";
+
+e.disabled=true;
+
+}
+
+
+grid.appendChild(e);
+
+}
+
+
+/* =========================================================
+   STATS
+========================================================= */
+
+function renderStats(){
+
+document
+.getElementById("sCoins")
+.textContent=num(coins);
+
+document
+.getElementById("sCompleted")
+.textContent=completedLevels+"/30";
+
+document
+.getElementById("sUnlocked")
+.textContent=
+unlockedLevel>=31
+?"ENDLESS"
+:unlockedLevel;
+
+document
+.getElementById("sTotalCoins")
+.textContent=num(totalCoins);
+
+document
+.getElementById("sTime")
+.textContent=
+Math.floor(totalTime)+"s";
+
+document
+.getElementById("sBest")
+.textContent=
+Math.floor(bestEndless)+"s";
+
+}
+
+
+/* =========================================================
+   AGILITY
+========================================================= */
+
+const abilities={
+
+speed:{
+name:"Speed Boost",
+rarity:"weak",
+rarityName:"SŁABY",
+desc:"+50% szybkości przez 5 sekund. CD 25s.",
+duration:5,
+cd:25
+},
+
+slow:{
+name:"Enemy Slow",
+rarity:"weak",
+rarityName:"SŁABY",
+desc:"Wróg -50% szybkości przez 5 sekund. CD 25s.",
+duration:5,
+cd:25
+},
+
+shield:{
+name:"Shield",
+rarity:"medium",
+rarityName:"ŚREDNI",
+desc:"Wróg nie może złapać gracza przez 7 sekund. CD 30s.",
+duration:7,
+cd:30
+},
+
+superSpeed:{
+name:"Super Speed",
+rarity:"medium",
+rarityName:"ŚREDNI",
+desc:"+100% szybkości przez 7 sekund. CD 30s.",
+duration:7,
+cd:30
+},
+
+superSlow:{
+name:"Super Slow",
+rarity:"medium",
+rarityName:"ŚREDNI",
+desc:"Wróg zatrzymuje się przez 7 sekund. CD 30s.",
+duration:7,
+cd:30
+},
+
+magnet:{
+name:"Magnet",
+rarity:"rare",
+rarityName:"RZADKI",
+desc:"Przyciąga monety przez 12 sekund. CD 35s.",
+duration:12,
+cd:35
+},
+
+giant:{
+name:"Coin Giant",
+rarity:"rare",
+rarityName:"RZADKI",
+desc:"Monety są 2x większe, wróg zatrzymuje się przez 12 sekund. CD 35s.",
+duration:12,
+cd:35
+}
+
+};
+
+
+function agilityUnlocked(){
+
+return completedLevels>=30;
+
+}
+
+
+function shopTab(type){
+
+document
+.getElementById("agilityPage")
+.classList
+.toggle("active",type==="agility");
+
+document
+.getElementById("upgradePage")
+.classList
+.toggle("active",type==="upgrade");
+
+document
+.getElementById("tabAgility")
+.classList
+.toggle("active",type==="agility");
+
+document
+.getElementById("tabUpgrade")
+.classList
+.toggle("active",type==="upgrade");
+
+renderShop();
+
+}
+
+
+function renderShop(){
+
+document
+.getElementById("agilityLock")
+.style.display=
+agilityUnlocked()
+?"none"
+:"block";
+
+renderInventory();
+
+renderUpgrades();
+
+}
+
+
+function renderInventory(){
+
+const box=
+document.getElementById("inventory");
+
+box.innerHTML="";
+
+
+if(owned.length===0){
+
+box.innerHTML=
+"<div style='color:#8291a8'>Brak Agility.</div>";
+
+return;
+
+}
+
+
+owned.forEach(id=>{
+
+const a=abilities[id];
+
+if(!a)return;
+
+
+const div=
+document.createElement("div");
+
+div.className=
+"ability"+
+(equipped===id?" equipped":"");
+
+
+div.innerHTML=`
+
+<div class="${a.rarity}">
+${a.rarityName}
+</div>
+
+<h4>${a.name}</h4>
+
+<p>${a.desc}</p>
+
+<button onclick="equip('${id}')">
+${equipped===id
+?"✓ WYPOSAŻONE"
+:"WYPOSAŻ"}
+</button>
+
+`;
+
+
+box.appendChild(div);
+
+});
+
+}
+
+
+/* =========================================================
+   UPGRADE
+========================================================= */
+
+function upgradePrice(base,level){
+
+return nearest10(
+base*Math.pow(1.4,level)
+);
+
+}
+
+
+function renderUpgrades(){
+
+document
+.getElementById("sizeLvl")
+.textContent=sizeLevel;
+
+document
+.getElementById("coolLvl")
+.textContent=cooldownLevel;
+
+document
+.getElementById("valueLvl")
+.textContent=valueLevel;
+
+
+const a=
+document.getElementById("sizeBuy");
+
+const b=
+document.getElementById("coolBuy");
+
+const c=
+document.getElementById("valueBuy");
+
+
+if(sizeLevel>=5){
+
+a.textContent="MAKSIMUM";
+a.disabled=true;
+
+}else{
+
+a.textContent=
+"🪙 "+num(
+upgradePrice(100,sizeLevel)
+);
+
+a.disabled=false;
+
+}
+
+
+if(cooldownLevel>=10){
+
+b.textContent="MAKSIMUM";
+b.disabled=true;
+
+}else{
+
+b.textContent=
+"🪙 "+num(
+upgradePrice(150,cooldownLevel)
+);
+
+b.disabled=false;
+
+}
+
+
+if(valueLevel>=20){
+
+c.textContent="MAKSIMUM";
+c.disabled=true;
+
+}else{
+
+c.textContent=
+"🪙 "+num(
+upgradePrice(250,valueLevel)
+);
+
+c.disabled=false;
+
+}
+
+}
+
+
+function buyUpgrade(type){
+
+let level;
+let max;
+let base;
+
+
+if(type==="size"){
+
+level=sizeLevel;
+max=5;
+base=100;
+
+}
+
+
+if(type==="cool"){
+
+level=cooldownLevel;
+max=10;
+base=150;
+
+}
+
+
+if(type==="value"){
+
+level=valueLevel;
+max=20;
+base=250;
+
+}
+
+
+if(level>=max)return;
+
+
+const price=
+upgradePrice(base,level);
+
+
+if(coins<price){
+
+toast("Brakuje monet.");
+
+return;
+
+}
+
+
+coins-=price;
+
+
+if(type==="size")
+sizeLevel++;
+
+if(type==="cool")
+cooldownLevel++;
+
+if(type==="value")
+valueLevel++;
+
+
+save();
+
+renderShop();
+
+toast("Ulepszenie kupione!");
+
+}
+
+
+/* =========================================================
+   SKRZYNIE
+========================================================= */
+
+const chests={
+
+basic:{
+price:50,
+weak:85,
+medium:14
+},
+
+uncommon:{
+price:150,
+weak:65,
+medium:32
+},
+
+rare:{
+price:500,
+weak:50,
+medium:42
+}
+
+};
+
+
+function openChest(type){
+
+if(!agilityUnlocked()){
+
+toast(
+"🔒 Najpierw ukończ wszystkie 30 leveli!"
+);
+
+return;
+
+}
+
+
+const c=chests[type];
+
+
+if(coins<c.price){
+
+toast("Brakuje monet.");
+
+return;
+
+}
+
+
+coins-=c.price;
+
+
+const r=
+Math.random()*100;
+
+let rarity;
+
+
+if(r<c.weak){
+
+rarity="weak";
+
+}else if(r<c.weak+c.medium){
+
+rarity="medium";
+
+}else{
+
+rarity="rare";
+
+}
+
+
+const list=
+Object.keys(abilities)
+.filter(
+x=>abilities[x].rarity===rarity
+);
+
+
+const id=
+list[
+Math.floor(
+Math.random()*list.length
+)
+];
+
+
+if(owned.includes(id)){
+
+const refund=
+Math.floor(c.price*.25);
+
+coins+=refund;
+
+toast(
+"Duplikat! Zwrot "+
+num(refund)+
+" monet."
+);
+
+}else{
+
+owned.push(id);
+
+toast(
+"🎉 Otrzymano "+
+abilities[id].name+
+"!"
+);
+
+}
+
+
+save();
+
+renderShop();
+
+}
+
+
+function equip(id){
+
+if(!agilityUnlocked()){
+
+toast("🔒 Agility jest zablokowane.");
+
+return;
+
+}
+
+equipped=id;
+
+save();
+
+renderShop();
+
+toast(
+"WYBRANO: "+
+abilities[id].name
+);
+
+}
+
+
+/* =========================================================
+   GRA
+========================================================= */
+
+const canvas=
+document.getElementById("canvas");
+
+const ctx=
+canvas.getContext("2d");
+
+
+let running=false;
+
+let level=1;
+
+let player=null;
+
+let enemy=null;
+
+let map=[];
+
+let coinList=[];
+
+let exit=null;
+
+let collected=0;
+
+let startTime=0;
+
+let gameSeconds=0;
+
+let last=0;
+
+let activeAbility=null;
+
+let abilityUntil=0;
+
+let abilityCooldownUntil=0;
+
+let playerMultiplier=1;
+
+let enemyMultiplier=1;
+
+let shield=false;
+
+
+/* =========================================================
+   STEROWANIE
+========================================================= */
+
+const keys={};
+
+
+window.addEventListener(
+"keydown",
+e=>{
+
+keys[e.code]=true;
+
+
+if([
+"ArrowUp",
+"ArrowDown",
+"ArrowLeft",
+"ArrowRight",
+"Space"
+].includes(e.code)){
+
+e.preventDefault();
+
+}
+
+
+if(e.code==="KeyE"&&running){
+
+useAbility();
+
+}
+
+});
+
+
+window.addEventListener(
+"keyup",
+e=>{
+
+keys[e.code]=false;
+
+});
+
+
+window.addEventListener(
+"blur",
+()=>{
+
+Object.keys(keys)
+.forEach(k=>{
+keys[k]=false;
+});
+
+});
+
+
+/* =========================================================
+   MAPY
+========================================================= */
+
+const mapPatterns=[
+
+[
+[130,120,260,22],
+[130,120,22,180],
+[390,120,22,180],
+[390,278,250,22],
+[618,160,22,140],
+[618,160,160,22]
+],
+
+[
+[150,100,22,180],
+[150,100,230,22],
+[380,100,22,170],
+[380,250,230,22],
+[588,250,22,200],
+[588,428,190,22]
+],
+
+[
+[180,130,250,22],
+[180,130,22,250],
+[180,358,300,22],
+[458,200,22,180],
+[458,200,250,22],
+[686,200,22,230]
+],
+
+[
+[120,150,220,22],
+[320,150,22,170],
+[320,298,260,22],
+[558,180,22,140],
+[558,180,220,22],
+[756,180,22,280]
+],
+
+[
+[150,120,22,280],
+[150,120,300,22],
+[428,120,22,190],
+[428,288,230,22],
+[636,288,22,190],
+[636,456,160,22]
+],
+
+[
+[120,110,180,22],
+[280,110,22,230],
+[280,318,280,22],
+[538,210,22,130],
+[538,210,240,22],
+[756,210,22,260]
+],
+
+[
+[180,100,22,220],
+[180,100,250,22],
+[408,100,22,160],
+[408,238,230,22],
+[616,238,22,230],
+[616,446,180,22]
+],
+
+[
+[130,130,300,22],
+[130,130,22,200],
+[430,130,22,220],
+[430,328,260,22],
+[668,200,22,150],
+[668,200,120,22]
+],
+
+[
+[160,110,22,250],
+[160,110,260,22],
+[398,110,22,170],
+[398,258,250,22],
+[628,258,22,230],
+[628,466,170,22]
+],
+
+[
+[100,120,260,22],
+[360,120,22,190],
+[360,288,270,22],
+[608,160,22,150],
+[608,160,190,22],
+[776,160,22,300]
+]
+
+];
+
+
+function createMap(n){
+
+map=[];
+
+
+const base=
+mapPatterns[
+(n-1)%mapPatterns.length
+];
+
+
+base.forEach(w=>{
+
+map.push({
+x:w[0],
+y:w[1],
+w:w[2],
+h:w[3]
+});
+
+});
+
+
+if(n>=11){
+
+map.push({
+x:100+(n%4)*40,
+y:430,
+w:180,
+h:22
+});
+
+
+map.push({
+x:500,
+y:350+(n%3)*25,
+w:220,
+h:22
+});
+
+}
+
+
+if(n>=21){
+
+map.push({
+x:90,
+y:250+(n%5)*15,
+w:130,
+h:20
+});
+
+
+map.push({
+x:680,
+y:430-(n%4)*25,
+w:130,
+h:20
+});
+
+}
+
+}
+
+
+/* =========================================================
+   KOLIZJA GRACZA ZE ŚCIANAMI
+========================================================= */
+
+function hitWall(x,y,r){
+
+if(x-r<0)
+return true;
+
+if(x+r>900)
+return true;
+
+if(y-r<60)
+return true;
+
+if(y+r>600)
+return true;
+
+
+for(const w of map){
+
+const cx=
+Math.max(
+w.x,
+Math.min(x,w.x+w.w)
+);
+
+const cy=
+Math.max(
+w.y,
+Math.min(y,w.y+w.h)
+);
+
+const dx=x-cx;
+
+const dy=y-cy;
+
+
+if(
+dx*dx+dy*dy<r*r
+){
+
+return true;
+
+}
+
+}
+
+
+return false;
+
+}
+
+
+/* =========================================================
+   POZYCJA BEZ ŚCIANY
+========================================================= */
+
+function freePosition(r){
+
+for(let i=0;i<500;i++){
+
+const x=
+40+Math.random()*820;
+
+const y=
+90+Math.random()*470;
+
+
+if(!hitWall(x,y,r)){
+
+return {x,y};
+
+}
+
+}
+
+
+return {
+x:70,
+y:90
+};
+
+}
+
+
+/* =========================================================
+   START LEVELU
+========================================================= */
+
+function startLevel(n){
+
+if(n>unlockedLevel){
+
+toast("Level jest zablokowany.");
+
+return;
+
+}
+
+
+if(n===31&&unlockedLevel<31){
+
+toast(
+"Najpierw ukończ 30 leveli."
+);
+
+return;
+
+}
+
+
+level=n;
+
+
+createMap(n);
+
+
+player={
+x:70,
+y:90,
+r:15,
+speed:286
+};
+
+
+enemy={
+x:800,
+y:100,
+r:18,
+speed:156
+};
+
+
+/*
+=========================================================
+WAŻNA ZMIANA:
+
+Gracz nadal musi być ustawiony poza ścianą.
+Wróg może startować w dowolnym miejscu.
+=========================================================
+*/
+
+if(hitWall(
+player.x,
+player.y,
+player.r
+)){
+
+const p=
+freePosition(player.r);
+
+player.x=p.x;
+player.y=p.y;
+
+}
+
+
+coinList=[];
+
+collected=0;
+
+
+for(let i=0;i<5;i++){
+
+const p=
+freePosition(12);
+
+coinList.push({
+x:p.x,
+y:p.y,
+taken:false
+});
+
+}
+
+
+exit={
+x:820,
+y:530,
+w:45,
+h:45
+};
+
+
+activeAbility=null;
+
+abilityUntil=0;
+
+abilityCooldownUntil=0;
+
+playerMultiplier=1;
+
+enemyMultiplier=1;
+
+shield=false;
+
+startTime=
+performance.now();
+
+gameSeconds=0;
+
+last=
+performance.now();
+
+
+document
+.getElementById("hudLevel")
+.textContent=
+n===31
+?"ENDLESS"
+:n;
+
+
+document
+.getElementById("hudCoins")
+.textContent="0/5";
+
+
+document
+.getElementById("gameOver")
+.classList
+.remove("show");
+
+
+document
+.getElementById("complete")
+.classList
+.remove("show");
+
+
+running=true;
+
+screen("game");
+
+requestAnimationFrame(loop);
+
+}
+
+
+/* =========================================================
+   RUCH GRACZA
+========================================================= */
+
+function updatePlayer(dt){
+
+let dx=0;
+
+let dy=0;
+
+
+if(keys.KeyW||keys.ArrowUp)
+dy--;
+
+if(keys.KeyS||keys.ArrowDown)
+dy++;
+
+if(keys.KeyA||keys.ArrowLeft)
+dx--;
+
+if(keys.KeyD||keys.ArrowRight)
+dx++;
+
+
+if(dx===0&&dy===0)
+return;
+
+
+const len=
+Math.hypot(dx,dy);
+
+
+dx/=len;
+dy/=len;
+
+
+const speed=
+player.speed*
+playerMultiplier;
+
+
+const nx=
+player.x+
+dx*speed*dt;
+
+const ny=
+player.y+
+dy*speed*dt;
+
+
+/*
+ŚCIANY BLOKUJĄ GRACZA
+*/
+
+if(
+!hitWall(
+nx,
+player.y,
+player.r
+)
+){
+
+player.x=nx;
+
+}
+
+
+if(
+!hitWall(
+player.x,
+ny,
+player.r
+)
+){
+
+player.y=ny;
+
+}
+
+}
+
+
+/* =========================================================
+   RUCH CZERWONEJ KULKI
+========================================================= */
+
+function updateEnemy(dt){
+
+/*
+=========================================================
+WAŻNE:
+
+CZERWONA KULKA NIE SPRAWDZA ŚCIAN.
+
+Może przechodzić przez wszystkie ściany
+i cały czas podążać za graczem.
+=========================================================
+*/
+
+let dx=
+player.x-
+enemy.x;
+
+let dy=
+player.y-
+enemy.y;
+
+
+const d=
+Math.hypot(dx,dy);
+
+
+if(d<1)
+return;
+
+
+dx/=d;
+dy/=d;
+
+
+const speed=
+enemy.speed*
+enemyMultiplier;
+
+
+/*
+BRAK hitWall() TUTAJ!
+*/
+
+enemy.x+=
+dx*speed*dt;
+
+enemy.y+=
+dy*speed*dt;
+
+
+/*
+Jedynie ograniczamy przeciwnika
+do granic ekranu.
+*/
+
+enemy.x=
+Math.max(
+enemy.r,
+Math.min(
+900-enemy.r,
+enemy.x
+)
+);
+
+
+enemy.y=
+Math.max(
+60+enemy.r,
+Math.min(
+600-enemy.r,
+enemy.y
+)
+);
+
+}
+
+
+/* =========================================================
+   MONETY
+========================================================= */
+
+function updateCoins(dt){
+
+for(const c of coinList){
+
+if(c.taken)
+continue;
+
+
+if(activeAbility==="magnet"){
+
+let dx=
+player.x-c.x;
+
+let dy=
+player.y-c.y;
+
+
+const d=
+Math.hypot(dx,dy);
+
+
+if(d>1){
+
+dx/=d;
+dy/=d;
+
+
+c.x+=
+dx*300*dt;
+
+c.y+=
+dy*300*dt;
+
+}
+
+}
+
+
+const size=
+(
+activeAbility==="giant"
+?18
+:11
+)*
+coinSize();
+
+
+if(
+Math.hypot(
+player.x-c.x,
+player.y-c.y
+)
+<
+player.r+size
+){
+
+c.taken=true;
+
+collected++;
+
+
+const reward=
+Math.max(
+1,
+Math.round(
+coinMultiplier()
+)
+);
+
+
+coins+=reward;
+
+totalCoins+=reward;
+
+
+document
+.getElementById("hudCoins")
+.textContent=
+collected+"/5";
+
+
+save();
+
+}
+
+}
+
+}
+
+
+/* =========================================================
+   AGILITY
+========================================================= */
+
+function useAbility(){
+
+if(!agilityUnlocked()){
+
+toast(
+"🔒 Ukończ wszystkie 30 leveli!"
+);
+
+return;
+
+}
+
+
+if(!equipped){
+
+toast(
+"Nie masz wyposażonego Agility."
+);
+
+return;
+
+}
+
+
+const now=
+performance.now();
+
+
+if(now<
+abilityCooldownUntil){
+
+return;
+
+}
+
+
+const a=
+abilities[equipped];
+
+
+activeAbility=
+equipped;
+
+
+abilityUntil=
+now+
+a.duration*1000;
+
+
+abilityCooldownUntil=
+now+
+cooldown(a.cd)*1000;
+
+
+playerMultiplier=1;
+
+enemyMultiplier=1;
+
+shield=false;
+
+
+if(equipped==="speed")
+playerMultiplier=1.5;
+
+
+if(equipped==="slow")
+enemyMultiplier=.5;
+
+
+if(equipped==="shield")
+shield=true;
+
+
+if(equipped==="superSpeed")
+playerMultiplier=2;
+
+
+if(equipped==="superSlow")
+enemyMultiplier=0;
+
+
+if(equipped==="giant")
+enemyMultiplier=0;
+
+
+toast(
+"⚡ "+
+a.name+
+"!"
+);
+
+}
+
+
+function updateAbility(){
+
+if(!activeAbility)
+return;
+
+
+if(
+performance.now()>=abilityUntil
+){
+
+activeAbility=null;
+
+playerMultiplier=1;
+
+enemyMultiplier=1;
+
+shield=false;
+
+}
+
+}
+
+
+/* =========================================================
+   KOLIZJA Z WROGIEM
+========================================================= */
+
+function checkEnemy(){
+
+if(shield)
+return;
+
+
+const d=
+Math.hypot(
+player.x-enemy.x,
+player.y-enemy.y
+);
+
+
+if(
+d<
+player.r+enemy.r
+){
+
+gameOver();
+
+}
+
+}
+
+
+/* =========================================================
+   EXIT
+========================================================= */
+
+function checkExit(){
+
+if(level===31)
+return;
+
+
+if(collected<5)
+return;
+
+
+if(
+player.x>exit.x&&
+player.x<exit.x+exit.w&&
+player.y>exit.y&&
+player.y<exit.y+exit.h
+){
+
+completeLevel();
+
+}
+
+}
+
+
+/* =========================================================
+   GAME OVER
+========================================================= */
+
+function gameOver(){
+
+running=false;
+
+document
+.getElementById("gameOver")
+.classList
+.add("show");
+
+}
+
+
+/* =========================================================
+   UKOŃCZENIE
+========================================================= */
+
+function completeLevel(){
+
+running=false;
+
+
+const t=
+Math.floor(gameSeconds);
+
+
+totalTime+=t;
+
+
+if(level<=30){
+
+if(level>completedLevels){
+
+completedLevels=level;
+
+}
+
+
+if(level===30){
+
+unlockedLevel=31;
+
+}else{
+
+unlockedLevel=
+Math.max(
+unlockedLevel,
+level+1
+);
+
+}
+
+}
+
+
+if(level===31){
+
+if(
+bestEndless===0||
+t<bestEndless
+){
+
+bestEndless=t;
+
+}
+
+}
+
+
+save();
+
+
+if(level===30){
+
+document
+.getElementById("completeText")
+.textContent=
+"🎉 Ukończyłeś wszystkie 30 leveli! ENDLESS i AGILITY są odblokowane!";
+
+
+document
+.getElementById("nextBtn")
+.textContent=
+"♾️ ENDLESS";
+
+
+}else if(level===31){
+
+document
+.getElementById("completeText")
+.textContent=
+"Przetrwałeś "+t+" sekund w ENDLESS!";
+
+
+document
+.getElementById("nextBtn")
+.style.display="none";
+
+
+}else{
+
+document
+.getElementById("completeText")
+.textContent=
+"Level "+
+level+
+" ukończony w "+
+t+
+" sekund.";
+
+
+document
+.getElementById("nextBtn")
+.style.display="block";
+
+
+document
+.getElementById("nextBtn")
+.textContent=
+"▶ LEVEL "+
+(level+1);
+
+}
+
+
+document
+.getElementById("complete")
+.classList
+.add("show");
+
+}
+
+
+/* =========================================================
+   NASTĘPNY LEVEL
+========================================================= */
+
+function nextLevel(){
+
+document
+.getElementById("complete")
+.classList
+.remove("show");
+
+
+if(level<30){
+
+startLevel(level+1);
+
+}else if(level===30){
+
+startLevel(31);
+
+}
+
+}
+
+
+/* =========================================================
+   WYJŚCIE
+========================================================= */
+
+function leaveGame(){
+
+running=false;
+
+hideOverlays();
+
+showMenu();
+
+}
+
+
+function hideOverlays(){
+
+document
+.getElementById("gameOver")
+.classList
+.remove("show");
+
+document
+.getElementById("complete")
+.classList
+.remove("show");
+
+}
+
+
+function restartLevel(){
+
+hideOverlays();
+
+startLevel(level);
+
+}
+
+
+function showLevelsFromGame(){
+
+running=false;
+
+hideOverlays();
+
+showLevels();
+
+}
+
+
+function showStatsFromGame(){
+
+running=false;
+
+hideOverlays();
+
+showStats();
+
+}
+
+
+/* =========================================================
+   RYSOWANIE
+========================================================= */
+
+function draw(){
+
+/* TŁO */
+
+ctx.fillStyle="#0b111a";
+
+ctx.fillRect(
+0,
+0,
+900,
+600
+);
+
+
+/* SIATKA */
+
+ctx.strokeStyle=
+"rgba(100,130,170,.08)";
+
+ctx.lineWidth=1;
+
+
+for(
+let x=0;
+x<900;
+x+=30
+){
+
+ctx.beginPath();
+
+ctx.moveTo(x,60);
+
+ctx.lineTo(x,600);
+
+ctx.stroke();
+
+}
+
+
+for(
+let y=60;
+y<600;
+y+=30
+){
+
+ctx.beginPath();
+
+ctx.moveTo(0,y);
+
+ctx.lineTo(900,y);
+
+ctx.stroke();
+
+}
+
+
+/* HUD */
+
+ctx.fillStyle="#101927";
+
+ctx.fillRect(
+0,
+0,
+900,
+60
+);
+
+
+/* ŚCIANY */
+
+for(const w of map){
+
+ctx.fillStyle="#1c2b40";
+
+ctx.fillRect(
+w.x,
+w.y,
+w.w,
+w.h
+);
+
+
+ctx.strokeStyle="#3b587c";
+
+ctx.lineWidth=2;
+
+ctx.strokeRect(
+w.x,
+w.y,
+w.w,
+w.h
+);
+
+}
+
+
+/* EXIT */
+
+if(level!==31){
+
+ctx.fillStyle=
+collected>=5
+?"#18a96b"
+:"#9d3038";
+
+
+ctx.fillRect(
+exit.x,
+exit.y,
+exit.w,
+exit.h
+);
+
+
+ctx.strokeStyle=
+collected>=5
+?"#64ffad"
+:"#ef626a";
+
+
+ctx.strokeRect(
+exit.x,
+exit.y,
+exit.w,
+exit.h
+);
+
+
+ctx.fillStyle="white";
+
+ctx.font=
+"bold 12px Arial";
+
+ctx.textAlign="center";
+
+
+ctx.fillText(
+"EXIT",
+exit.x+exit.w/2,
+exit.y+28
+);
+
+}
+
+
+/* MONETY */
+
+for(const c of coinList){
+
+if(c.taken)
+continue;
+
+
+const radius=
+(
+activeAbility==="giant"
+?18
+:11
+)*
+coinSize();
+
+
+ctx.beginPath();
+
+
+ctx.arc(
+c.x,
+c.y,
+radius,
+0,
+Math.PI*2
+);
+
+
+ctx.fillStyle="#f5c542";
+
+ctx.fill();
+
+
+ctx.strokeStyle="#ffe99a";
+
+ctx.lineWidth=2;
+
+ctx.stroke();
+
+
+ctx.fillStyle="#8b6500";
+
+ctx.font=
+"bold 13px Arial";
+
+ctx.textAlign="center";
+
+
+ctx.fillText(
+"¢",
+c.x,
+c.y+4
+);
+
+}
+
+
+/* CZERWONA KULKA */
+
+if(enemy){
+
+ctx.beginPath();
+
+
+ctx.arc(
+enemy.x,
+enemy.y,
+enemy.r,
+0,
+Math.PI*2
+);
+
+
+ctx.fillStyle="#e63845";
+
+ctx.fill();
+
+
+ctx.strokeStyle="#ff8a91";
+
+ctx.stroke();
+
+
+/* oczy */
+
+ctx.fillStyle="white";
+
+
+ctx.beginPath();
+
+ctx.arc(
+enemy.x-6,
+enemy.y-4,
+3,
+0,
+Math.PI*2
+);
+
+ctx.arc(
+enemy.x+6,
+enemy.y-4,
+3,
+0,
+Math.PI*2
+);
+
+ctx.fill();
+
+}
+
+
+/* SHIELD */
+
+if(
+player&&
+shield
+){
+
+ctx.beginPath();
+
+
+ctx.arc(
+player.x,
+player.y,
+player.r+9,
+0,
+Math.PI*2
+);
+
+
+ctx.strokeStyle="#5bb7ff";
+
+ctx.lineWidth=3;
+
+ctx.stroke();
+
+}
+
+
+/* NIEBIESKA KULKA */
+
+if(player){
+
+ctx.beginPath();
+
+
+ctx.arc(
+player.x,
+player.y,
+player.r,
+0,
+Math.PI*2
+);
+
+
+ctx.fillStyle="#287cff";
+
+ctx.fill();
+
+
+ctx.strokeStyle="#a1c9ff";
+
+ctx.lineWidth=2;
+
+ctx.stroke();
+
+}
+
+
+/* TEKST */
+
+ctx.fillStyle="#8998ac";
+
+ctx.font="14px Arial";
+
+ctx.textAlign="left";
+
+
+ctx.fillText(
+"WASD / STRZAŁKI - RUCH",
+15,
+22
+);
+
+
+ctx.fillText(
+agilityUnlocked()&&equipped
+?"E - "+abilities[equipped].name
+:"AGILITY ZABLOKOWANE",
+15,
+43
+);
+
+
+ctx.textAlign="right";
+
+
+ctx.fillStyle=
+collected>=5
+?"#55e69a"
+:"#9aa8bb";
+
+
+ctx.fillText(
+level===31
+?"ENDLESS - PRZETRWAJ JAK NAJDŁUŻEJ"
+:
+(
+collected>=5
+?"EXIT ODBLOKOWANY"
+:"ZBIERZ 5 MONET"
+),
+885,
+28
+);
+
+}
+
+
+/* =========================================================
+   PĘTLA GRY
+========================================================= */
+
+function loop(time){
+
+const dt=
+Math.min(
+0.05,
+(time-last)/1000
+);
+
+
+last=time;
+
+
+if(running){
+
+gameSeconds=
+(time-startTime)/1000;
+
+
+document
+.getElementById("hudTime")
+.textContent=
+Math.floor(gameSeconds);
+
+
+updatePlayer(dt);
+
+updateEnemy(dt);
+
+updateCoins(dt);
+
+updateAbility();
+
+checkEnemy();
+
+checkExit();
+
+
+let abilityText=
+"AGILITY LOCK";
+
+
+if(agilityUnlocked()){
+
+if(!equipped){
+
+abilityText="BRAK";
+
+}else{
+
+const left=
+Math.ceil(
+Math.max(
+0,
+abilityCooldownUntil-time
+)/1000
+);
+
+
+if(
+time<
+abilityCooldownUntil
+){
+
+abilityText=
+abilities[equipped].name+
+" "+
+left+
+"s";
+
+}else{
+
+abilityText=
+abilities[equipped].name+
+" [E]";
+
+}
+
+}
+
+}
+
+
+document
+.getElementById("hudAbility")
+.textContent=
+abilityText;
+
+}
+
+
+draw();
+
+requestAnimationFrame(loop);
+
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+let toastTimer;
+
+
+function toast(text){
+
+const el=
+document.getElementById("toast");
+
+
+el.textContent=text;
+
+el.classList.add("show");
+
+
+clearTimeout(toastTimer);
+
+
+toastTimer=
+setTimeout(
+()=>{
+el.classList.remove("show");
+},
+2500
+);
+
+}
+
+
+/* =========================================================
+   START
+========================================================= */
+
+updateMenu();
+
+renderLevels();
+
+renderShop();
+
+renderStats();
+
+
+createMap(1);
+
+
+player={
+x:70,
+y:90,
+r:15,
+speed:286
+};
+
+
+/*
+Wróg może być nawet w miejscu,
+które normalnie jest za ścianą.
+*/
+
+enemy={
+x:800,
+y:100,
+r:18,
+speed:156
+};
+
+
+coinList=[];
+
+
+for(let i=0;i<5;i++){
+
+const p=
+freePosition(12);
+
+coinList.push({
+x:p.x,
+y:p.y,
+taken:false
+});
+
+}
+
+
+exit={
+x:820,
+y:530,
+w:45,
+h:45
+};
+
+
+last=
+performance.now();
+
+
+requestAnimationFrame(loop);
+
+</script>
+
+</body>
+</html>
